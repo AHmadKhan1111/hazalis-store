@@ -1,0 +1,35 @@
+✅ Cloudinary configured
+🚀 Server running on port 80
+🌐 Allowed Origins: [
+  'http://localhost:5173',
+  'https://hazalis.com',
+  'https://www.hazalis.com',
+  'https://api.hazalis.com',
+  'http://13.63.128.118',
+  'http://hazalis.com'
+]
+🌱 Environment: production
+🖥️ Client Base URL: http://hazalis.com
+✅ MongoDB connected
+URIError: Failed to decode param '/cgi-bin/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/bin/sh'
+    at decodeURIComponent (<anonymous>)
+    at decode_param (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\layer.js:172:12)
+    at Layer.match (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\layer.js:123:27)
+    at matchLayer (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\index.js:585:18)
+    at next (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\index.js:226:15)
+    at cors (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:188:7)
+    at C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:224:17
+    at origin (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\server.js:71:27)
+    at C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:199:9)
+URIError: Failed to decode param '/cgi-bin/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/%%32%65%%32%65/bin/sh'
+    at decodeURIComponent (<anonymous>)
+    at decode_param (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\layer.js:172:12)
+    at Layer.match (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\layer.js:123:27)
+    at matchLayer (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\index.js:585:18)
+    at next (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\express\lib\router\index.js:226:15)
+    at cors (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:188:7)
+    at C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:224:17
+    at origin (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\server.js:71:27)
+    at C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:219:13
+    at optionsCallback (C:\Users\Administrator\Downloads\Hazalis-main\Hazalis-main\server\node_modules\cors\lib\index.js:199:9)
