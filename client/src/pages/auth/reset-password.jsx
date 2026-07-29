@@ -2,6 +2,7 @@ import CommonForm from "@/components/common/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
 import axios from "@/config/api";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const initialState = {
   newPassword: "",
