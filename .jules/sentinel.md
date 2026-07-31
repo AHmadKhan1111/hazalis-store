@@ -1,0 +1,4 @@
+## 2024-07-31 - Secure Password Reset Token Storage & Session Cookies
+**Vulnerability:** Plaintext password reset tokens were stored directly in MongoDB, and authentication cookies were configured with `secure: false` even in production environments.
+**Learning:** Storing reset tokens in plaintext allows any database compromise to immediately lead to account takeover. Setting session cookies as insecure allows transport-layer sniffing. In production architectures using secure proxy setups (like Cloudflare), backend cookies must still be flagged as `secure` so browsers enforce HTTPS transmission.
+**Prevention:** Always hash temporary secrets (like password reset tokens or API key secrets) using SHA-256 before storing them in databases. Ensure cookie transmission policies conditionally enforce `secure: true` in production environments.
