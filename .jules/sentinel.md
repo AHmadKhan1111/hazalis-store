@@ -1,0 +1,4 @@
+## 2026-08-01 - Plaintext Password Reset Token Storage Vulnerability
+**Vulnerability:** The application was storing password reset tokens in plaintext inside the MongoDB database. Anyone with database read access could use active reset tokens to take over any user accounts.
+**Learning:** Legacy codebase patterns often implement quick password resets by storing generated `crypto.randomBytes` hex strings directly in the database without hashing them. Because they are short-lived, developers sometimes overlook the security requirement of treating reset tokens with the same confidentiality as passwords.
+**Prevention:** Always SHA-256 hash any sensitive secret tokens (such as password reset tokens, API keys, or verification codes) before saving them to the database, while sending the raw token only to the authorized user (via email or direct response). Query and verify by hashing the incoming token and performing a lookup against the hashed version.
