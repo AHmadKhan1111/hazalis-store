@@ -158,7 +158,9 @@ const forgotPassword = async (req, res) => {
 
     // Generate a reset token
     const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
+    // Secure token storage: Store a SHA-256 hash of the token in the database
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
     await user.save();
@@ -232,8 +234,10 @@ const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    // Secure token verification: Hash the incoming raw token and search for the hash
+    const hashedToken = crypto.createHash("sha256").update(token || "").digest("hex");
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
