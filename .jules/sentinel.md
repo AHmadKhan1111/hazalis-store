@@ -1,0 +1,4 @@
+## 2026-08-08 - Secure Token Hashing and Cookies in Reverse Proxies
+**Vulnerability:** Plaintext password reset tokens stored in MongoDB, and insecure session cookies.
+**Learning:** Storing reset tokens in plaintext allows attackers who compromise the database to gain immediate account takeover capabilities. In addition, cookies set with `secure: false` can be intercepted on unencrypted channels or leaked, even when the production site is hosted behind a reverse proxy like Cloudflare.
+**Prevention:** Always hash short-lived secrets (like password reset or API keys) using a secure hashing algorithm (such as SHA-256) before persisting them. Furthermore, dynamically set the cookie's `secure` flag to `config.nodeEnv === "production"` to guarantee secure transmission via HTTPS in production while allowing seamless HTTP local testing.

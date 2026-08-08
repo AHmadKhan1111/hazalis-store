@@ -77,7 +77,7 @@ const loginUser = async (req, res) => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // Allow HTTP (Cloudflare handles SSL)
+        secure: process.env.NODE_ENV === "production", // Secure cookie in production (behind proxy)
         sameSite: "Lax",
         maxAge: 60 * 60 * 1000,
       })
@@ -105,7 +105,7 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "Lax",
   }).json({
     success: true,
@@ -158,7 +158,9 @@ const forgotPassword = async (req, res) => {
 
     // Generate a reset token
     const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
+    // Securely hash the token before storing it in MongoDB to prevent leaks
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
     await user.save();
@@ -232,8 +234,10 @@ const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    // Hash the token from the user to match the hashed token in the database
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
