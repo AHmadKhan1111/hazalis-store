@@ -10,7 +10,9 @@ const searchProducts = async (req, res) => {
       });
     }
 
-    const regEx = new RegExp(keyword, "i");
+    // Escape special regex characters to prevent ReDoS and invalid regular expression syntax error
+    const safeKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regEx = new RegExp(safeKeyword, "i");
 
     const createSearchQuery = {
       $or: [
