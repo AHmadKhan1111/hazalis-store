@@ -1,16 +1,23 @@
 const Product = require("../../models/Product");
 
+// Helper function to escape special regular expression characters in user input
+const escapeRegExp = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
 const searchProducts = async (req, res) => {
   try {
     const { keyword } = req.params;
     if (!keyword || typeof keyword !== "string") {
       return res.status(400).json({
-        succes: false,
+        success: false,
         message: "Keyword is required and must be in string format",
       });
     }
 
-    const regEx = new RegExp(keyword, "i");
+    // Escape user input before creating regular expression to prevent Regex Injection / ReDoS
+    const escapedKeyword = escapeRegExp(keyword);
+    const regEx = new RegExp(escapedKeyword, "i");
 
     const createSearchQuery = {
       $or: [
