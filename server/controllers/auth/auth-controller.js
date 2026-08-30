@@ -60,7 +60,7 @@ const loginUser = async (req, res) => {
         message: "Incorrect password! Please try again",
       });
 
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret || process.env.JWT_SECRET;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
 
     const token = jwt.sign(
@@ -70,14 +70,14 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         userName: checkUser.userName,
       },
-      config.jwtSecret,
+      secret,
       { expiresIn: "60m" },
     );
 
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // Allow HTTP (Cloudflare handles SSL)
+        secure: process.env.NODE_ENV === "production",
         sameSite: "Lax",
         maxAge: 60 * 60 * 1000,
       })
@@ -105,7 +105,7 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "Lax",
   }).json({
     success: true,
@@ -130,16 +130,16 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret || process.env.JWT_SECRET;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (e) {
-    console.log(e);
-    res.status(500).json({
+    console.log("Auth error:", e.message);
+    res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorized token!",
     });
   }
 };
@@ -156,9 +156,13 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate a reset token
+    // Generate a reset token and store its SHA-256 hash in DB for security
     const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
     await user.save();
@@ -232,8 +236,12 @@ const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
