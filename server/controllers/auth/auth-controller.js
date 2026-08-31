@@ -60,7 +60,7 @@ const loginUser = async (req, res) => {
         message: "Incorrect password! Please try again",
       });
 
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
 
     const token = jwt.sign(
@@ -70,14 +70,14 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         userName: checkUser.userName,
       },
-      config.jwtSecret,
+      secret,
       { expiresIn: "60m" },
     );
 
     res
       .cookie("token", token, {
         httpOnly: true,
-        secure: false, // Allow HTTP (Cloudflare handles SSL)
+        secure: config.nodeEnv === "production",
         sameSite: "Lax",
         maxAge: 60 * 60 * 1000,
       })
@@ -105,7 +105,7 @@ const loginUser = async (req, res) => {
 const logoutUser = (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
+    secure: config.nodeEnv === "production",
     sameSite: "Lax",
   }).json({
     success: true,
@@ -130,16 +130,16 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (e) {
     console.log(e);
-    res.status(500).json({
+    res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
