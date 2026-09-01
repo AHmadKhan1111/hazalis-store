@@ -60,8 +60,8 @@ const loginUser = async (req, res) => {
         message: "Incorrect password! Please try again",
       });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET is not defined!");
+    // Security: Ensure JWT secret is present before signing token
+    if (!config.jwtSecret) throw new Error("JWT_SECRET is not defined!");
 
     const token = jwt.sign(
       {
@@ -130,16 +130,17 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET is not defined!");
-    const decoded = jwt.verify(token, secret);
+    // Security: Ensure JWT secret is loaded consistently
+    if (!config.jwtSecret) throw new Error("JWT_SECRET is not defined!");
+    const decoded = jwt.verify(token, config.jwtSecret);
     req.user = decoded;
     next();
   } catch (e) {
-    console.log(e);
-    res.status(500).json({
+    // Security: Return 401 Unauthorized on invalid/expired token instead of 500 error
+    console.warn("Auth token verification failed:", e.message);
+    return res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
