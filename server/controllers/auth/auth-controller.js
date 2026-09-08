@@ -60,7 +60,7 @@ const loginUser = async (req, res) => {
         message: "Incorrect password! Please try again",
       });
 
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret || process.env.JWT_SECRET;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
 
     const token = jwt.sign(
@@ -70,7 +70,7 @@ const loginUser = async (req, res) => {
         email: checkUser.email,
         userName: checkUser.userName,
       },
-      config.jwtSecret,
+      secret,
       { expiresIn: "60m" },
     );
 
@@ -130,16 +130,17 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret || process.env.JWT_SECRET;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (e) {
     console.log(e);
-    res.status(500).json({
+    // Return HTTP 401 Unauthorized upon JWT verification failure
+    res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
