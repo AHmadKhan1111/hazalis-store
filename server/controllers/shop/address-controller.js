@@ -63,7 +63,7 @@ const fetchAllAddress = async (req, res) => {
 const editAddress = async (req, res) => {
   try {
     const { userId, addressId } = req.params;
-    const formData = req.body;
+    const { address: addressVal, city, pincode, phone, notes } = req.body;
 
     if (!userId || !addressId) {
       return res.status(400).json({
@@ -72,12 +72,20 @@ const editAddress = async (req, res) => {
       });
     }
 
+    // SECURITY: Prevent mass assignment vulnerabilities by explicitly picking allowed fields only
+    const updateData = {};
+    if (addressVal !== undefined) updateData.address = addressVal;
+    if (city !== undefined) updateData.city = city;
+    if (pincode !== undefined) updateData.pincode = pincode;
+    if (phone !== undefined) updateData.phone = phone;
+    if (notes !== undefined) updateData.notes = notes;
+
     const address = await Address.findOneAndUpdate(
       {
         _id: addressId,
         userId,
       },
-      formData,
+      updateData,
       { new: true }
     );
 
