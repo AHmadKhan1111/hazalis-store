@@ -5,11 +5,14 @@ const {
   getFeatureImages,
   deleteFeatureImage,
 } = require("../../controllers/common/feature-controller");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminMiddleware = require("../../middleware/admin-middleware");
 
 const router = express.Router();
 
-router.post("/add", addFeatureImage);
+// 🛡️ Security: Feature image management (add/delete) requires admin authentication
+router.post("/add", authMiddleware, adminMiddleware, addFeatureImage);
 router.get("/get", getFeatureImages);
-router.delete("/delete/:id", deleteFeatureImage);
+router.delete("/delete/:id", authMiddleware, adminMiddleware, deleteFeatureImage);
 
 module.exports = router;
