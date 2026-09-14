@@ -60,8 +60,7 @@ const loginUser = async (req, res) => {
         message: "Incorrect password! Please try again",
       });
 
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET is not defined!");
+    if (!config.jwtSecret) throw new Error("JWT_SECRET is not defined!");
 
     const token = jwt.sign(
       {
@@ -130,9 +129,8 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET is not defined!");
-    const decoded = jwt.verify(token, secret);
+    if (!config.jwtSecret) throw new Error("JWT_SECRET is not defined!");
+    const decoded = jwt.verify(token, config.jwtSecret);
     req.user = decoded;
     next();
   } catch (e) {
