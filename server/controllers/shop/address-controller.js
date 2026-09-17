@@ -11,6 +11,14 @@ const addAddress = async (req, res) => {
       });
     }
 
+    // Security authorization check: ensure the user can only create an address for themselves
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You are not authorized to perform this action.",
+      });
+    }
+
     const newlyCreatedAddress = new Address({
       userId,
       address,
@@ -45,6 +53,14 @@ const fetchAllAddress = async (req, res) => {
       });
     }
 
+    // Security authorization check: ensure users can only fetch their own addresses
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You are not authorized to access this data.",
+      });
+    }
+
     const addressList = await Address.find({ userId });
 
     res.status(200).json({
@@ -69,6 +85,14 @@ const editAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    // Security authorization check: ensure users can only modify their own addresses
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You are not authorized to perform this action.",
       });
     }
 
@@ -108,6 +132,14 @@ const deleteAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    // Security authorization check: ensure users can only delete their own addresses
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden: You are not authorized to perform this action.",
       });
     }
 
