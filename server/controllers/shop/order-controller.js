@@ -21,6 +21,14 @@ const createOrder = async (req, res) => {
       cartId,
     } = req.body;
 
+    // Security check: Ensure authenticated user matches request userId
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
     // ── Cash on Delivery ─────────────────────────────────────────────────────
     if (paymentMethod === "cod") {
       const newOrder = new Order({
@@ -148,6 +156,14 @@ const capturePayment = async (req, res) => {
       });
     }
 
+    // Security check: Ensure order belongs to authenticated user
+    if (order.userId.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
     order.paymentStatus = "paid";
     order.orderStatus = "confirmed";
     order.paymentId = paymentId;
@@ -191,6 +207,14 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Security check: Ensure authenticated user matches requested userId
+    if (req.user.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
     const orders = await Order.find({ userId });
 
     if (!orders.length) {
@@ -223,6 +247,14 @@ const getOrderDetails = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Order not found!",
+      });
+    }
+
+    // Security check: Ensure order belongs to authenticated user or admin
+    if (order.userId.toString() !== req.user.id && req.user.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
       });
     }
 
