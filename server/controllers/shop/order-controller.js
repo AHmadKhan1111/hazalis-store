@@ -191,6 +191,13 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    if (req.user?.id !== userId && req.user?.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access to order list!",
+      });
+    }
+
     const orders = await Order.find({ userId });
 
     if (!orders.length) {
@@ -223,6 +230,13 @@ const getOrderDetails = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Order not found!",
+      });
+    }
+
+    if (order.userId !== req.user?.id && req.user?.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access to order details!",
       });
     }
 
