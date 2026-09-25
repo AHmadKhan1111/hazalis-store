@@ -116,12 +116,6 @@ const logoutUser = (req, res) => {
 //auth middleware
 const authMiddleware = async (req, res, next) => {
   const token = req.cookies.token;
-  console.log("-----------------------------------------");
-  console.log("AUTH DEBUG:");
-  console.log("Cookies:", req.cookies);
-  console.log("Token:", token);
-  console.log("Headers:", req.headers);
-  console.log("-----------------------------------------");
 
   if (!token)
     return res.status(401).json({
@@ -130,16 +124,15 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
-    if (!secret) throw new Error("JWT_SECRET is not defined!");
-    const decoded = jwt.verify(token, secret);
+    if (!config.jwtSecret) throw new Error("JWT_SECRET is not defined!");
+    const decoded = jwt.verify(token, config.jwtSecret);
     req.user = decoded;
     next();
   } catch (e) {
-    console.log(e);
-    res.status(500).json({
+    // Return 401 Unauthorized on invalid or expired token instead of 500
+    return res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
