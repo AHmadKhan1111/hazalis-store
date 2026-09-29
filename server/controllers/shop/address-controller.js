@@ -11,6 +11,14 @@ const addAddress = async (req, res) => {
       });
     }
 
+    // Security: Ensure user can only create address for their own authenticated ID
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
     const newlyCreatedAddress = new Address({
       userId,
       address,
@@ -45,6 +53,14 @@ const fetchAllAddress = async (req, res) => {
       });
     }
 
+    // Security: Ensure user can only fetch their own addresses
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
+      });
+    }
+
     const addressList = await Address.find({ userId });
 
     res.status(200).json({
@@ -69,6 +85,14 @@ const editAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    // Security: Ensure user can only edit their own address
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
       });
     }
 
@@ -108,6 +132,14 @@ const deleteAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    // Security: Ensure user can only delete their own address
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access",
       });
     }
 
