@@ -12,6 +12,13 @@ const addToCart = async (req, res) => {
       });
     }
 
+    if (String(req.user?.id) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access!",
+      });
+    }
+
     const product = await Product.findById(productId);
 
     if (!product) {
@@ -59,6 +66,13 @@ const fetchCartItems = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User id is manadatory!",
+      });
+    }
+
+    if (String(req.user?.id) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access!",
       });
     }
 
@@ -116,6 +130,13 @@ const updateCartItemQty = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid data provided!",
+      });
+    }
+
+    if (String(req.user?.id) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access!",
       });
     }
 
@@ -178,6 +199,13 @@ const deleteCartItem = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Invalid data provided!",
+      });
+    }
+
+    if (String(req.user?.id) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access!",
       });
     }
 
