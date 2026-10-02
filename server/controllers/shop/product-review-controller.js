@@ -4,8 +4,16 @@ const ProductReview = require("../../models/Review");
 
 const addProductReview = async (req, res) => {
   try {
-    const { productId, userId, userName, reviewMessage, reviewValue } =
-      req.body;
+    const { productId, reviewMessage, reviewValue } = req.body;
+    const userId = req.user?.id;
+    const userName = req.user?.userName;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized user!",
+      });
+    }
 
     const order = await Order.findOne({
       userId,
