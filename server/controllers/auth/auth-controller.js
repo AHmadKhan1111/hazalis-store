@@ -137,9 +137,10 @@ const authMiddleware = async (req, res, next) => {
     next();
   } catch (e) {
     console.log(e);
-    res.status(500).json({
+    // Security: Invalid or expired JWT tokens are authentication failures (401 Unauthorized), not internal server errors (500).
+    res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
