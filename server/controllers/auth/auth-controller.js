@@ -130,16 +130,16 @@ const authMiddleware = async (req, res, next) => {
     });
 
   try {
-    const secret = process.env.JWT_SECRET;
+    const secret = config.jwtSecret;
     if (!secret) throw new Error("JWT_SECRET is not defined!");
     const decoded = jwt.verify(token, secret);
     req.user = decoded;
     next();
   } catch (e) {
-    console.log(e);
-    res.status(500).json({
+    console.log("JWT Verification Error:", e.message);
+    return res.status(401).json({
       success: false,
-      message: "Some error occurred",
+      message: "Unauthorised user!",
     });
   }
 };
