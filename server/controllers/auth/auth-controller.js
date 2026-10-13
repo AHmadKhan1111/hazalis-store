@@ -157,8 +157,13 @@ const forgotPassword = async (req, res) => {
     }
 
     // Generate a reset token
-    const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
+    const rawToken = crypto.randomBytes(20).toString("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(rawToken)
+      .digest("hex");
+
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
     await user.save();
@@ -174,7 +179,7 @@ const forgotPassword = async (req, res) => {
       },
     });
 
-    const resetUrl = `${config.clientBaseUrl}/auth/reset-password?token=${token}`;
+    const resetUrl = `${config.clientBaseUrl}/auth/reset-password?token=${rawToken}`;
 
     const mailOptions = {
       from: config.email.from,
@@ -232,8 +237,13 @@ const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
