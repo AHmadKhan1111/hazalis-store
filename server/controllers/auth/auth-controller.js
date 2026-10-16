@@ -156,9 +156,13 @@ const forgotPassword = async (req, res) => {
       });
     }
 
-    // Generate a reset token
+    // Generate a reset token and store SHA-256 hash in DB to mitigate token leaks
     const token = crypto.randomBytes(20).toString("hex");
-    user.resetPasswordToken = token;
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
     await user.save();
@@ -232,8 +236,14 @@ const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
 
   try {
+    // Hash incoming raw token to compare against stored SHA-256 hash
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token || "")
+      .digest("hex");
+
     const user = await User.findOne({
-      resetPasswordToken: token,
+      resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
