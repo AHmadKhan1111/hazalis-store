@@ -11,6 +11,13 @@ const addAddress = async (req, res) => {
       });
     }
 
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized action!",
+      });
+    }
+
     const newlyCreatedAddress = new Address({
       userId,
       address,
@@ -45,6 +52,13 @@ const fetchAllAddress = async (req, res) => {
       });
     }
 
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access!",
+      });
+    }
+
     const addressList = await Address.find({ userId });
 
     res.status(200).json({
@@ -69,6 +83,13 @@ const editAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized action!",
       });
     }
 
@@ -108,6 +129,13 @@ const deleteAddress = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "User and address id is required!",
+      });
+    }
+
+    if (req.user?.id !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized action!",
       });
     }
 
