@@ -7,7 +7,6 @@ const config = require("../../config/config");
 const createOrder = async (req, res) => {
   try {
     const {
-      userId,
       cartItems,
       addressInfo,
       orderStatus,
@@ -20,6 +19,9 @@ const createOrder = async (req, res) => {
       payerId,
       cartId,
     } = req.body;
+
+    // Security: Use authenticated user ID
+    const userId = req.user?.id;
 
     // ── Cash on Delivery ─────────────────────────────────────────────────────
     if (paymentMethod === "cod") {
@@ -191,6 +193,14 @@ const getAllOrdersByUser = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Authorization check: ensure users can only access their own orders
+    if (req.user?.id !== userId && req.user?.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access to order history!",
+      });
+    }
+
     const orders = await Order.find({ userId });
 
     if (!orders.length) {
@@ -223,6 +233,17 @@ const getOrderDetails = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Order not found!",
+      });
+    }
+
+    // Authorization check: ensure user owns order or is an admin
+    if (
+      order.userId.toString() !== req.user?.id &&
+      req.user?.role !== "admin"
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized access to order details!",
       });
     }
 
