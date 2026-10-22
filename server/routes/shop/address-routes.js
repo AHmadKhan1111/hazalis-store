@@ -6,12 +6,14 @@ const {
   editAddress,
   deleteAddress,
 } = require("../../controllers/shop/address-controller");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
 
 const router = express.Router();
 
-router.post("/add", addAddress);
-router.get("/get/:userId", fetchAllAddress);
-router.delete("/delete/:userId/:addressId", deleteAddress);
-router.put("/update/:userId/:addressId", editAddress);
+// All address routes require authentication to protect user PII
+router.post("/add", authMiddleware, addAddress);
+router.get("/get/:userId", authMiddleware, fetchAllAddress);
+router.delete("/delete/:userId/:addressId", authMiddleware, deleteAddress);
+router.put("/update/:userId/:addressId", authMiddleware, editAddress);
 
 module.exports = router;
