@@ -10,7 +10,9 @@ const searchProducts = async (req, res) => {
       });
     }
 
-    const regEx = new RegExp(keyword, "i");
+    // Escape special regex characters to prevent Regex Injection / ReDoS
+    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regEx = new RegExp(escapedKeyword, "i");
 
     const createSearchQuery = {
       $or: [
