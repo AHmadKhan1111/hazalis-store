@@ -6,10 +6,16 @@ const {
   deleteFeatureImage,
 } = require("../../controllers/common/feature-controller");
 
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminMiddleware = require("../../middleware/admin-middleware");
+
 const router = express.Router();
 
-router.post("/add", addFeatureImage);
+// Administrative routes - require authentication and admin role
+router.post("/add", authMiddleware, adminMiddleware, addFeatureImage);
+router.delete("/delete/:id", authMiddleware, adminMiddleware, deleteFeatureImage);
+
+// Public route for fetching homepage feature images
 router.get("/get", getFeatureImages);
-router.delete("/delete/:id", deleteFeatureImage);
 
 module.exports = router;
