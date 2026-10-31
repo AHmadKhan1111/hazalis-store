@@ -5,11 +5,16 @@ const {
   getFeatureImages,
   deleteFeatureImage,
 } = require("../../controllers/common/feature-controller");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminMiddleware = require("../../middleware/admin-middleware");
 
 const router = express.Router();
 
-router.post("/add", addFeatureImage);
+// Public route to fetch banners for homepage display
 router.get("/get", getFeatureImages);
-router.delete("/delete/:id", deleteFeatureImage);
+
+// Admin-only routes to prevent unauthorized banner uploads or deletions
+router.post("/add", authMiddleware, adminMiddleware, addFeatureImage);
+router.delete("/delete/:id", authMiddleware, adminMiddleware, deleteFeatureImage);
 
 module.exports = router;
