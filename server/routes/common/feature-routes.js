@@ -5,11 +5,19 @@ const {
   getFeatureImages,
   deleteFeatureImage,
 } = require("../../controllers/common/feature-controller");
+const { authMiddleware } = require("../../controllers/auth/auth-controller");
+const adminMiddleware = require("../../middleware/admin-middleware");
 
 const router = express.Router();
 
-router.post("/add", addFeatureImage);
-router.get("/get", getFeatureImages);
-router.delete("/delete/:id", deleteFeatureImage);
+// Security: Banner management endpoints require authentication and admin privileges to prevent unauthorized defacement
+router.post("/add", authMiddleware, adminMiddleware, addFeatureImage);
+router.get("/get", getFeatureImages); // Publicly accessible to fetch banner images
+router.delete(
+  "/delete/:id",
+  authMiddleware,
+  adminMiddleware,
+  deleteFeatureImage,
+);
 
 module.exports = router;
