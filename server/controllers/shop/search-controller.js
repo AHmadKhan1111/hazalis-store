@@ -10,7 +10,18 @@ const searchProducts = async (req, res) => {
       });
     }
 
-    const regEx = new RegExp(keyword, "i");
+    // Limit keyword length to prevent resource exhaustion / DoS
+    const trimmedKeyword = keyword.trim();
+    if (trimmedKeyword.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Keyword exceeds maximum allowed length of 100 characters",
+      });
+    }
+
+    // Escape regex metacharacters to prevent ReDoS (Regular Expression Denial of Service)
+    const escapedKeyword = trimmedKeyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const regEx = new RegExp(escapedKeyword, "i");
 
     const createSearchQuery = {
       $or: [
