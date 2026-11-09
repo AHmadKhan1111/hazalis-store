@@ -1,0 +1,4 @@
+## 2025-02-17 - Unsanitized User Input in Mongoose RegExp Search (ReDoS)
+**Vulnerability:** In `server/controllers/shop/search-controller.js`, `req.params.keyword` was passed unescaped directly into `new RegExp(keyword, "i")` without length validation or regex metacharacter escaping. Attackers could supply catastrophic backtracking regex patterns (e.g., `(a+)+$`) or arbitrary regex patterns to trigger Regular Expression Denial of Service (ReDoS) and block the single-threaded Node.js event loop.
+**Learning:** In MongoDB/Mongoose applications that implement text search via regular expressions rather than MongoDB full-text indexes, passing raw user query parameters straight into `new RegExp` creates ReDoS and unexpected query behaviour.
+**Prevention:** Always escape regex special characters (`/[.*+?^${}()|[\]\\]/g`) and enforce a reasonable maximum length on user search queries before creating regular expression objects.
